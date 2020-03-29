@@ -4,13 +4,22 @@ import './providers/products.dart';
 import './screens/products_overview_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import './screens/product_detail_screen.dart';
+import './providers/cart.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(
+          value: Products(),
+        ),
+        ChangeNotifierProvider.value(
+          value: Cart(),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
@@ -25,7 +34,6 @@ class MyApp extends StatelessWidget {
           ProductDetailScreen.screenId: (ctx) => ProductDetailScreen(),
         },
       ),
-      value: Products(),
     );
   }
 }
