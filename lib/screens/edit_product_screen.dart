@@ -17,6 +17,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _form = GlobalKey<FormState>();
   var _editedProduct =
       Product(id: null, title: '', price: 0.0, description: '', imageUrl: '');
+  var isNewProduct = true;
 
   var _intiValues = {
     'title': '',
@@ -38,6 +39,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (_isInit) {
       final productId = ModalRoute.of(context).settings.arguments as String;
       if (productId != null) {
+        isNewProduct = false;
         _editedProduct =
             Provider.of<Products>(context, listen: false).findById(productId);
         _intiValues = {
@@ -99,7 +101,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Product'),
+        title: Text('${isNewProduct ? 'Add' : 'Edit'} Product'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.save),
