@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/products.dart';
 import '../providers/product.dart';
 
 class EditProductScreen extends StatefulWidget {
@@ -16,10 +18,39 @@ class _EditProductScreenState extends State<EditProductScreen> {
   var _editedProduct =
       Product(id: null, title: '', price: 0.0, description: '', imageUrl: '');
 
+  var _intiValues = {
+    'title': '',
+    'description': '',
+    'price': '',
+    'imageUrl': '',
+  };
+
+  var _isInit = true;
+
   @override
   void initState() {
     _imageURLFocusNode.addListener(_updateImageURL);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final productId = ModalRoute.of(context).settings.arguments as String;
+      if (productId != null) {
+        _editedProduct =
+            Provider.of<Products>(context, listen: false).findById(productId);
+        _intiValues = {
+          'title': _editedProduct.title,
+          'description': _editedProduct.description,
+          'price': _editedProduct.price.toString(),
+          'imageUrl': '',
+        };
+        _imageURLController.text = _editedProduct.imageUrl;
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
   }
 
   void _updateImageURL() {
@@ -54,10 +85,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
 
     _form.currentState.save();
-    print(_editedProduct.title);
-    print(_editedProduct.description);
-    print(_editedProduct.price);
-    print(_editedProduct.imageUrl);
+    if (_editedProduct.id != null) {
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+    } else {
+      Provider.of<Products>(context, listen: false).addProducts(_editedProduct);
+    }
+
+    Navigator.of(context).pop();
   }
 
   @override
@@ -82,6 +117,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 decoration: InputDecoration(
                   labelText: 'Title',
                 ),
+                initialValue: _intiValues['title'],
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_priceFocusNode);
@@ -94,7 +130,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
                 onSaved: (value) {
                   _editedProduct = Product(
-                      id: null,
+                      id: _editedProduct.id,
+                      isFavorite: _editedProduct.isFavorite,
                       title: value,
                       description: _editedProduct.description,
                       price: _editedProduct.price,
@@ -105,6 +142,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 decoration: InputDecoration(
                   labelText: 'Price',
                 ),
+                initialValue: _intiValues['price'],
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.number,
                 focusNode: _priceFocusNode,
@@ -127,7 +165,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
                 onSaved: (value) {
                   _editedProduct = Product(
-                      id: null,
+                      id: _editedProduct.id,
+                      isFavorite: _editedProduct.isFavorite,
                       title: _editedProduct.title,
                       description: _editedProduct.description,
                       price: double.parse(value),
@@ -138,6 +177,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 decoration: InputDecoration(
                   labelText: 'Description',
                 ),
+                initialValue: _intiValues['description'],
                 maxLines: 3,
                 keyboardType: TextInputType.multiline,
                 focusNode: _descriptionFocusNode,
@@ -152,7 +192,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
                 onSaved: (value) {
                   _editedProduct = Product(
-                      id: null,
+                      id: _editedProduct.id,
+                      isFavorite: _editedProduct.isFavorite,
                       title: _editedProduct.title,
                       description: value,
                       price: _editedProduct.price,
@@ -203,7 +244,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       },
                       onSaved: (value) {
                         _editedProduct = Product(
-                            id: null,
+                            id: _editedProduct.id,
+                            isFavorite: _editedProduct.isFavorite,
                             title: _editedProduct.title,
                             description: _editedProduct.description,
                             price: _editedProduct.price,
