@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/user_products_screen.dart';
 import '../screens/orders_screen.dart';
 import '../screens/products_overview_screen.dart';
 
@@ -19,6 +20,15 @@ class AppDraw extends StatelessWidget {
             onTap: () {
               Navigator.of(context)
                   .pushReplacementNamed(ProductsOverViewScreen.screenId);
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.edit),
+            title: Text('Manage Products'),
+            onTap: () {
+              Navigator.of(context)
+                  .pushReplacementNamed(UserProductsScreen.screenId);
             },
           ),
           Divider(),
