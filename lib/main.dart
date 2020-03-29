@@ -10,7 +10,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider.value(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           ProductDetailScreen.screenId: (ctx) => ProductDetailScreen(),
         },
       ),
-      create: (_) => Products(),
+      value: Products(),
     );
   }
 }
