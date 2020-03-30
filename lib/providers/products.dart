@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'product.dart';
 
 class Products with ChangeNotifier {
@@ -60,15 +62,29 @@ class Products with ChangeNotifier {
 //    notifyListeners();
 //  }
 
-  void addProducts(Product product) {
-    final newProduct = Product(
-        title: product.title,
-        price: product.price,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        id: DateTime.now().toString());
-    _items.insert(0, newProduct); //add at the beginning of the list
-    notifyListeners();
+  Future<void> addProducts(Product product) async {
+    const url = '';
+    return await http
+        .post(
+      url,
+      body: json.encode({
+        'title': product.title,
+        'description': product.description,
+        'price': product.price,
+        'imageUrl': product.imageUrl,
+        'isFavorite': product.isFavorite,
+      }),
+    )
+        .then((res) {
+      final newProduct = Product(
+          title: product.title,
+          price: product.price,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          id: json.decode(res.body)['name']);
+      _items.insert(0, newProduct); //add at the beginning of the list
+      notifyListeners();
+    });
   }
 
   void updateProduct(String id, Product newProduct) {
