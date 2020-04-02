@@ -7,6 +7,10 @@ import '../widgets/order_item.dart';
 class OrdersScreen extends StatelessWidget {
   static final screenId = 'OrdersScreen';
 
+  Future<void> _handleRefresh(BuildContext context) async {
+    await Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,25 +21,28 @@ class OrdersScreen extends StatelessWidget {
       body: FutureBuilder(
         future: Provider.of<Orders>(context, listen: false).fetchAndSetOrders(),
         builder: (ctx, dataSnapshot) {
-          if (dataSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            if (dataSnapshot.error != null) {
+          switch (dataSnapshot.connectionState) {
+            case ConnectionState.none:
+              return Text('Press button to start.');
+            case ConnectionState.active:
+            case ConnectionState.waiting:
               return Center(
-                child: Text('An error occurred'),
+                child: CircularProgressIndicator(),
               );
-            } else {
-              return Consumer<Orders>(
-                builder: (ctx, orderData, child) => ListView.builder(
-                  itemBuilder: (ctx, index) => OrderItem(
-                    orderData.orders[index],
+            case ConnectionState.done:
+              return RefreshIndicator(
+                  child: Consumer<Orders>(
+                    builder: (ctx, orderData, child) => ListView.builder(
+                      itemBuilder: (ctx, index) => OrderItem(
+                        orderData.orders[index],
+                      ),
+                      itemCount: orderData.orders.length,
+                    ),
                   ),
-                  itemCount: orderData.orders.length,
-                ),
-              );
-            }
+                  onRefresh: () => _handleRefresh(context));
+              break;
+            default:
+              return null;
           }
         },
       ),

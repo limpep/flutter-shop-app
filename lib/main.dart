@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import './providers/auth.dart';
+import './screens/auth_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/user_products_screen.dart';
 import './screens/orders_screen.dart';
@@ -19,6 +21,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
+          value: Auth(),
+        ),
+        ChangeNotifierProvider.value(
           value: Products(),
         ),
         ChangeNotifierProvider.value(
@@ -28,23 +33,26 @@ class MyApp extends StatelessWidget {
           value: Orders(),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: GoogleFonts.lato().fontFamily,
+      child: Consumer<Auth>(
+        builder: (ctx, auth, _) => MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+            fontFamily: GoogleFonts.lato().fontFamily,
+          ),
+          home: auth.isAuth ? ProductsOverViewScreen() : AuthScreen(),
+          routes: {
+            ProductsOverViewScreen.screenId: (ctx) => ProductsOverViewScreen(),
+            ProductDetailScreen.screenId: (ctx) => ProductDetailScreen(),
+            CartScreen.screenId: (ctx) => CartScreen(),
+            OrdersScreen.screenId: (ctx) => OrdersScreen(),
+            UserProductsScreen.screenId: (ctx) => UserProductsScreen(),
+            EditProductScreen.screenId: (ctx) => EditProductScreen(),
+            AuthScreen.screenId: (ctx) => AuthScreen(),
+          },
         ),
-        initialRoute: ProductsOverViewScreen.screenId,
-        routes: {
-          ProductsOverViewScreen.screenId: (ctx) => ProductsOverViewScreen(),
-          ProductDetailScreen.screenId: (ctx) => ProductDetailScreen(),
-          CartScreen.screenId: (ctx) => CartScreen(),
-          OrdersScreen.screenId: (ctx) => OrdersScreen(),
-          UserProductsScreen.screenId: (ctx) => UserProductsScreen(),
-          EditProductScreen.screenId: (ctx) => EditProductScreen(),
-        },
       ),
     );
   }

@@ -1,1 +1,2 @@
-const baseURL = 'YOUR FIREBASE DATABASE HERE!';
+const baseURL = 'YOURURL';
+const API_KEY = 'YOURKEY';
