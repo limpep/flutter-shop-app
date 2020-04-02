@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:shoppingapp/models/http_exception.dart';
+import '../models/http_exception.dart';
+import '../utils/constants.dart';
 import 'product.dart';
 
 class Products with ChangeNotifier {
@@ -65,12 +65,16 @@ class Products with ChangeNotifier {
 //  }
 
   Future<void> fetchAndSetProducts() async {
-    const url = 'YOUR FIREBASE DATABASE HERE!';
+    const url = '$baseURL/products.json';
 
     try {
       final response = await http.get(url);
       final extractedData = jsonDecode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
+
+      if (extractedData == null) {
+        return;
+      }
 
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -90,7 +94,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProducts(Product product) async {
-    const url = 'YOUR FIREBASE DATABASE HERE!';
+    const url = '$baseURL/products.json';
     try {
       final response = await http.post(
         url,
@@ -119,7 +123,7 @@ class Products with ChangeNotifier {
     final prodIndex = _items.indexWhere((prod) => prod.id == newProduct.id);
     if (prodIndex >= 0) {
       try {
-        final url = 'YOUR FIREBASE DATABASE HERE!$id.json';
+        final url = '$baseURL/products/$id.json';
         await http.patch(url,
             body: json.encode({
               'title': newProduct.title,
@@ -142,7 +146,7 @@ class Products with ChangeNotifier {
     _items.removeAt(existingProductIndex);
     notifyListeners();
 
-    final url = 'YOUR FIREBASE DATABASE HERE!$id.json';
+    final url = '$baseURL/products/$id.json';
     final response = await http.delete(url);
 
     if (response.statusCode >= 400) {

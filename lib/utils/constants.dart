@@ -1,0 +1,1 @@
+const baseURL = 'YOUR FIREBASE DATABASE HERE!';
