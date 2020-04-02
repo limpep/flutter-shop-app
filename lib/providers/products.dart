@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shoppingapp/models/http_exception.dart';
 import 'product.dart';
 
 class Products with ChangeNotifier {
@@ -88,7 +90,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProducts(Product product) async {
-    const url = 'https://flutter-shop-fbd52.firebaseio.com/products.json';
+    const url = 'YOUR FIREBASE DATABASE HERE!';
     try {
       final response = await http.post(
         url,
@@ -113,17 +115,43 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == newProduct.id);
     if (prodIndex >= 0) {
-      _items[prodIndex] = newProduct;
-      notifyListeners();
+      try {
+        final url = 'YOUR FIREBASE DATABASE HERE!$id.json';
+        await http.patch(url,
+            body: json.encode({
+              'title': newProduct.title,
+              'description': newProduct.description,
+              'price': newProduct.price,
+              'imageUrl': newProduct.imageUrl,
+            }));
+        _items[prodIndex] = newProduct;
+        notifyListeners();
+      } catch (error) {
+        throw error;
+      }
     }
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((prod) => prod.id == id);
+  Future<void> deleteProduct(String id) async {
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProduct = _items[existingProductIndex];
+
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+
+    final url = 'YOUR FIREBASE DATABASE HERE!$id.json';
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('Could not delete product.');
+    }
+
+    existingProduct = null;
   }
 
   Product findById(String id) {
