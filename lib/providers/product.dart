@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shoppingapp/utils/constants.dart';
 
 class Product with ChangeNotifier {
   final String id;
@@ -24,18 +25,18 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleFavState() async {
+  Future<void> toggleFavState(String auth, String userId) async {
     final oldStatus = isFavorite;
 
     isFavorite = !isFavorite;
     notifyListeners();
 
-    final url = 'https://flutter-shop-fbd52.firebaseio.com/products/$id.json';
+    final url = '$baseURL/userFavorites/$userId/$id.json?auth=$auth';
     try {
-      final response = await http.patch(url,
-          body: json.encode({
-            'isFavorite': isFavorite,
-          }));
+      final response = await http.put(url,
+          body: json.encode(
+            isFavorite,
+          ));
       if (response.statusCode >= 400) {
         _setFavValue(oldStatus);
       }
